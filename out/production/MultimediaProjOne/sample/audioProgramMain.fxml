@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="500.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <center>
+      <VBox prefHeight="396.0" prefWidth="505.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Channel 1">
+               <VBox.margin>
+                  <Insets left="80.0" top="15.0" />
+               </VBox.margin>
+            </Label>
+            <LineChart fx:id="channelOneChart" prefWidth="982.0">
+               <xAxis>
+                  <NumberAxis label="Time (s)" prefHeight="18.0" prefWidth="600.0" side="BOTTOM" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis label="Amplitude" side="LEFT" />
+               </yAxis>
+            </LineChart>
+            <Label text="Channel 2">
+               <VBox.margin>
+                  <Insets left="80.0" />
+               </VBox.margin>
+            </Label>
+            <LineChart layoutX="10.0" layoutY="10.0" prefWidth="506.0">
+               <xAxis>
+                  <NumberAxis label="Time (s)" prefHeight="18.0" prefWidth="600.0" side="BOTTOM" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis label="Amplitude" side="LEFT" />
+               </yAxis>
+            </LineChart>
+         </children>
+         <BorderPane.margin>
+            <Insets left="10.0" right="10.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+   <bottom>
+      <AnchorPane maxHeight="90.0" minWidth="800.0" prefWidth="1000.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" onAction="#openFileAudio" prefHeight="25.0" prefWidth="120.0" text="Open File..." AnchorPane.bottomAnchor="34.0" AnchorPane.leftAnchor="100.0" />
+            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="Fade in/out" AnchorPane.bottomAnchor="34.0" AnchorPane.rightAnchor="100.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </Button>
+            <Label layoutX="389.0" layoutY="4.0" text="Number of Samples:" AnchorPane.leftAnchor="389.0" AnchorPane.topAnchor="4.0" />
+            <Label layoutX="389.0" layoutY="21.0" text="Sampling frequency:" AnchorPane.bottomAnchor="21.0" AnchorPane.topAnchor="21.0" />
+            <Label fx:id="sampleNumberLabel" layoutX="523.0" layoutY="4.0" text="Label" AnchorPane.bottomAnchor="38.0" AnchorPane.topAnchor="4.0" />
+            <Label fx:id="sampleFrequencyLabel" layoutX="523.0" layoutY="21.0" text="Label" AnchorPane.bottomAnchor="21.0" AnchorPane.topAnchor="21.0" />
+         </children>
+      </AnchorPane>
+   </bottom>
+   <top>
+      <AnchorPane maxHeight="50.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button layoutX="80.0" layoutY="68.0" mnemonicParsing="false" onAction="#navToLaunch" text="Back to Launch" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
+         </children>
+      </AnchorPane>
+   </top>
+</BorderPane>

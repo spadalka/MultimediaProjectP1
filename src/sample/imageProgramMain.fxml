@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+
+<BorderPane prefHeight="200.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <bottom>
+      <AnchorPane maxHeight="90.0" prefHeight="90.0" prefWidth="650.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button layoutX="101.0" layoutY="8.0" mnemonicParsing="false" onAction="#openFileImage" prefHeight="25.0" prefWidth="120.0" text="Open File..." AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="101.0" />
+            <Button layoutX="429.0" layoutY="8.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="Next" AnchorPane.bottomAnchor="57.0" AnchorPane.rightAnchor="101.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </Button>
+            <Label fx:id="nextPreviewTransformation" layoutX="447.0" layoutY="37.0" text="Original to Grey" AnchorPane.bottomAnchor="36.0" AnchorPane.rightAnchor="118.0" />
+            <Button layoutX="101.0" layoutY="43.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="Quit" />
+         </children>
+      </AnchorPane>
+   </bottom>
+   <top>
+      <AnchorPane maxHeight="50.0" prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button layoutX="80.0" layoutY="68.0" mnemonicParsing="false" onAction="#navToLaunch" text="Back to Launch" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
+         </children>
+      </AnchorPane>
+   </top>
+   <center>
+      <AnchorPane prefHeight="187.0" prefWidth="650.0" BorderPane.alignment="CENTER">
+         <children>
+            <Pane minHeight="180.0" minWidth="220.0" style="-fx-border-color: black; -fx-border-width: 3;" AnchorPane.leftAnchor="50.0">
+               <children>
+                  <ImageView pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </Pane>
+            <Pane minHeight="180.0" minWidth="220.0" style="-fx-border-color: black; -fx-border-width: 3;" AnchorPane.rightAnchor="50.0">
+               <children>
+                  <ImageView pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </Pane>
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="50.0" top="50.0" />
+         </BorderPane.margin>
+      </AnchorPane>
+   </center>
+</BorderPane>

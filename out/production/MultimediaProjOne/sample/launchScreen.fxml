@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="490.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <children>
+      <Button fx:id="audioProgramButton" layoutX="101.0" layoutY="37.0" mnemonicParsing="false" onAction="#navToAudioProgram" prefHeight="25.0" prefWidth="120.0" text="Audio Program" AnchorPane.bottomAnchor="37.0" AnchorPane.leftAnchor="101.0" AnchorPane.topAnchor="37.0" />
+      <Button fx:id="imageProgramButton" layoutX="269.0" layoutY="37.0" mnemonicParsing="false" onAction="#navToImageProgram" prefHeight="25.0" prefWidth="120.0" text="Image Program" AnchorPane.bottomAnchor="37.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="37.0" />
+   </children>
+</AnchorPane>
