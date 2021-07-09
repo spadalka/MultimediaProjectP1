@@ -2,6 +2,7 @@ package sample;
 
 import java.awt.Desktop;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,16 +18,20 @@ import javafx.stage.Stage;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Line;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class Controller {
 
+    @FXML
     private Label sampleNumberLabel;
+
+    @FXML
     private Label sampleFrequencyLabel;
 
     private Label nextPreviewTransformation;
@@ -34,8 +39,6 @@ public class Controller {
     private Stage stage;
     private Scene scene;
     private Parent root;
-
-
 
 
     public void navToAudioProgram(ActionEvent event) throws IOException {
@@ -68,12 +71,27 @@ public class Controller {
     @FXML
     private LineChart channelOneChart;
 
+    @FXML
+    private LineChart channelTwoChart;
+
 
     private int totalFramesRead = 0;
-    XYChart.Series series = new XYChart.Series();
+    XYChart.Series channelOneSeries = new XYChart.Series();
+    XYChart.Series channelTwoSeries = new XYChart.Series();
+
+    @FXML
+    private Button fadeInOutButton;
 
 
-    public void extractAudioData(File file, LineChart lineChartOne, XYChart.Series series ) {
+    public void extractAudioData(File file, LineChart lineChartOne, LineChart lineChartTwo,
+                                 XYChart.Series seriesOne, XYChart.Series seriesTwo ) {
+
+        seriesOne.getData().clear();
+        seriesTwo.getData().clear();
+
+        lineChartOne.getData().clear();
+        lineChartTwo.getData().clear();
+
         try {
 
             AudioInputStream audioInputStream =
@@ -85,7 +103,7 @@ public class Controller {
                 // in that case we may read any amount of bytes
                 bytesPerFrame = 1;
             }
-            // Set an arbitrary buffer size of 1024 frames.
+            int numChannels = audioInputStream.getFormat().getChannels();
             int numBytes = (int) file.length();
             byte[] audioBytes = new byte[numBytes];
             try {
@@ -94,35 +112,59 @@ public class Controller {
                 int x = 0;
                 // Try to read numBytes bytes from the file.
                 while (x<numBytes) {
-                        numBytesRead =
-                        audioInputStream.read(audioBytes) ;
+                    numBytesRead = audioInputStream.read(audioBytes);
                     // Calculate the number of frames actually read.
                     numFramesRead = numBytesRead / bytesPerFrame;
                     totalFramesRead += numFramesRead;
-//                    System.out.println("length" + audioBytes.length); //2048
-//                    System.out.println("numBytesRead" + numBytesRead);
-//                    System.out.println("numFramesRead" + numFramesRead);
-                    // Here, do something useful with the audio data that's
-                    // now in the audioBytes array...
-//                    byte[] bytePair = {audioBytes[x+1], audioBytes[x]};
-//                    System.out.println(bytePair[0] + ", (byte) " + bytePair[1]+ "\n");
 
-                    ByteBuffer bb = ByteBuffer.wrap(audioBytes, x, 2);
-                    bb.order(ByteOrder.LITTLE_ENDIAN);
-//                    System.out.println(bb.getShort() + ", (bb get short) " + "\n");
+                    if (numChannels==1) {
+                        if (x%5 == 0) {
+                            ByteBuffer bb = ByteBuffer.wrap(audioBytes, x, 2);
+                            bb.order(ByteOrder.LITTLE_ENDIAN);
+        //                    System.out.println(bb.getShort() + ", (bb get short) " + "\n");
+                            short audioAmplitude = bb.getShort();
+                            float modulatedAmplitude = normalizeAudio(audioAmplitude);
+        //                    System.out.println(x + ", " + audioAmplitude+ "\n");
+                            seriesOne.getData().add(new XYChart.Data((x/2), modulatedAmplitude));
+                        }
+                        x+=2;
+                    } else if (numChannels==2) {
+                        if (x%10 == 0) {
+                            ByteBuffer bb = ByteBuffer.wrap(audioBytes, x, 4);
+                            bb.order(ByteOrder.LITTLE_ENDIAN);
+                            short audioAmplitude = bb.getShort();
+                            float modulatedAmplitude = normalizeAudio(audioAmplitude);
 
-                    short audioAmplitude = bb.getShort();
-//                    System.out.println(x + ", " + audioAmplitude+ "\n");
-                    series.getData().add(new XYChart.Data((x/2), (int) audioAmplitude));
-                    x+=2;
+                            seriesOne.getData().add(new XYChart.Data((x/4), modulatedAmplitude));
+
+                            bb = ByteBuffer.wrap(audioBytes, x+2, 2);
+                            bb.order(ByteOrder.LITTLE_ENDIAN);
+                            audioAmplitude = bb.getShort();
+                            modulatedAmplitude = normalizeAudio(audioAmplitude);
+                            seriesTwo.getData().add(new XYChart.Data((x/4), modulatedAmplitude));
+                        }
+                        x+=4;
+                    }
                 }
 //                System.out.println(series.getData().);
 //                System.out.println(Arrays.toString(audioBytes));
 //                System.out.println("bytesPerFrame" + bytesPerFrame);
 //                System.out.println("totalFramesRead" + totalFramesRead);
 
+                lineChartOne.setCreateSymbols(false);
+                lineChartOne.setHorizontalGridLinesVisible(false);
+                lineChartOne.setVerticalGridLinesVisible(false);
 
-                lineChartOne.getData().add(series);
+                lineChartTwo.setCreateSymbols(false);
+                lineChartTwo.setHorizontalGridLinesVisible(false);
+                lineChartTwo.setVerticalGridLinesVisible(false);
+
+                lineChartOne.getData().add(seriesOne);
+                lineChartTwo.getData().add(seriesTwo);
+
+                sampleNumberLabel.setText(totalFramesRead + " Samples");
+                sampleFrequencyLabel.setText(audioInputStream.getFormat().getSampleRate() + " Hz");
+
 
 
             } catch (Exception ex) {
@@ -133,10 +175,72 @@ public class Controller {
         }
     }
 
+    public void fadeInOutHandler(ActionEvent event) throws IOException {
+        fadeInOut(channelOneChart, channelTwoChart, channelOneSeries, channelTwoSeries);
+    }
+
+    public void fadeInOut(LineChart lineChartOne, LineChart lineChartTwo,
+                          XYChart.Series seriesOne, XYChart.Series seriesTwo) {
+
+        lineChartOne.getData().clear();
+        lineChartTwo.getData().clear();
+
+
+        float amplification;
+        float floatTotalFramesRead =  (float) totalFramesRead;
+        modVolume(seriesOne, floatTotalFramesRead);
+        modVolume(seriesTwo, floatTotalFramesRead);
+
+//
+        lineChartOne.getData().add(seriesOne);
+        lineChartTwo.getData().add(seriesTwo);
+//        System.out.println(seriesOne.getData());
+//        System.out.println(seriesTwo.getData());
+//        seriesOne.getData().clear();
+//        seriesTwo.getData().clear();
+    }
+
+    public void modVolume(XYChart.Series series, float floatTotalFramesRead) {
+        float amplification;
+        float halfSize = (float) (series.getData().size())/2;
+        for (int i = 0; i < (series.getData().size())/2; i++) {
+            amplification = (float) Math.pow(10, ((((20/halfSize)*i)-20)/20));
+            System.out.println(i + " with " + amplification);
+            XYChart.Data data = (XYChart.Data) series.getData().get(i);
+            float oldValue = (float) data.getYValue();
+            float newAmplitude = oldValue * amplification;
+            data.setYValue(newAmplitude);
+        }
+
+        int j = (series.getData().size())/2;
+        for (int i = (series.getData().size())/2; i < series.getData().size(); i++) {
+            amplification = (float) Math.pow(10, ((((20/halfSize)*j)-20)/20));
+            System.out.println(i + " with2 " + amplification);
+            XYChart.Data data = (XYChart.Data) series.getData().get(i);
+            float oldValue = (float) data.getYValue();
+            float newAmplitude = oldValue * amplification;
+            data.setYValue(newAmplitude);
+            j--;
+        }
+    }
+
+    //}
+    public float normalizeAudio (short audioAmplitude) {
+        int normalizeFactor;
+        float modulatedAmplitude;
+        if (audioAmplitude < 0) {
+            normalizeFactor = 32768;
+        } else {
+            normalizeFactor = 32767;
+        }
+        modulatedAmplitude = (float) audioAmplitude/normalizeFactor;
+        return modulatedAmplitude;
+    }
+
     public void openFileAudio(ActionEvent event) throws IOException{
         file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            extractAudioData(file, channelOneChart, series);
+            extractAudioData(file, channelOneChart, channelTwoChart, channelOneSeries, channelTwoSeries);
         }
     }
 

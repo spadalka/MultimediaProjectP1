@@ -1,0 +1,9 @@
+#channelOneChart .chart-series-line {
+    -fx-stroke-width: 0.5px;
+    -fx-stroke: #2a6cde;
+}
+
+#channelTwoChart .chart-series-line {
+    -fx-stroke-width: 0.5px;
+    -fx-stroke: #ff8929;
+}
