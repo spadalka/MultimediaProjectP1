@@ -19,7 +19,7 @@
                </opaqueInsets>
             </Button>
             <Label fx:id="nextPreviewTransformation" layoutX="782.0" layoutY="35.0" text="Original to GrayScale" AnchorPane.bottomAnchor="38.0" AnchorPane.rightAnchor="103.0" />
-            <Button layoutX="101.0" layoutY="43.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="Quit" />
+            <Button layoutX="101.0" layoutY="43.0" mnemonicParsing="false" onAction="#quit" prefHeight="25.0" prefWidth="120.0" text="Quit" />
          </children>
       </AnchorPane>
    </bottom>
