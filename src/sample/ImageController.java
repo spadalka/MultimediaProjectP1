@@ -48,6 +48,9 @@ public class ImageController {
 
     private File file;
 
+    BufferedImage modifiableImage;
+
+
 
     public void navToLaunch(ActionEvent event) throws IOException {
         root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("launchScreen.fxml")));
@@ -68,7 +71,55 @@ public class ImageController {
     public void transitionScene(ActionEvent event) {
         if (globalStepCounter == 1){
             normalToGrayScale(file);
+        } else if (globalStepCounter == 2) {
+            grayScaleToDither(modifiableImage);
         }
+    }
+
+    public void grayScaleToDither (BufferedImage image) {
+        int[][] matrix4 = {{0, 2}, {3, 1}};
+        int[][] matrix16 = {{0, 8, 2, 10}, {12, 4, 14, 6}, {3, 11, 1, 9}, {15, 7, 13, 5}};
+        int[][] matrix64 = {{0, 32, 8, 40, 2, 34, 10, 42},
+                {48, 16, 56, 24, 50, 18, 58, 26},
+                {12, 44, 4, 36, 14, 46, 6, 38},
+                {60, 28, 52, 20, 62, 30, 54, 22},
+                {3, 35, 11, 43, 1, 33, 9, 41},
+                {51, 19, 59, 27, 49, 17, 57, 25},
+                {15, 47, 7, 39, 13, 45, 5, 37},
+                {63, 31, 55, 23, 61, 29, 53, 21}};
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int n = 2;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int i = x % n;
+                int j = y % n;
+                Color colorAtPixel = new Color(image.getRGB(x, y));
+                int reMapped = (int)(colorAtPixel.getRed()/(256/(n*n+1)));
+                Color newValue;
+                if (reMapped > matrix4[i][j]) {
+                    newValue = new Color(255, 255, 255);
+                } else {
+                    newValue = new Color(0, 0, 0);
+                }
+                image.setRGB(x, y, newValue.getRGB());
+            }
+        }
+        Image displayImage = SwingFXUtils.toFXImage(image, null);
+        ImageView imageView = new ImageView(displayImage);
+        pane.getChildren().set(0, imageView);
+        StackPane.setAlignment(imageView, Pos.CENTER);
+        nextPreviewTransformation.setText("Original Autoleveled");
+
+//        File output = new File("dithered.bmp");
+//        try {
+//            ImageIO.write(modifiableImage, "bmp", output);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
     }
 
     public void normalToGrayScale (File file) {
@@ -80,7 +131,7 @@ public class ImageController {
             e.printStackTrace();
         }
         assert originalImage != null;
-        BufferedImage modifiableImage = deepCopy(originalImage);
+        modifiableImage = deepCopy(originalImage);
 
         int width = modifiableImage.getWidth();
         int height = modifiableImage.getHeight();
@@ -97,28 +148,26 @@ public class ImageController {
             }
         }
 
-            Image image = SwingFXUtils.toFXImage(modifiableImage, null);
-            ImageView imageView = new ImageView(image);
+            Image displayImage = SwingFXUtils.toFXImage(modifiableImage, null);
+            ImageView imageView = new ImageView(displayImage);
             pane.getChildren().set(0, imageView);
             StackPane.setAlignment(imageView, Pos.CENTER);
 
 
-        File output = new File("grayscale.bmp");
-        try {
-            ImageIO.write(modifiableImage, "bmp", output);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        File output = new File("grayscale.bmp");
+//        try {
+//            ImageIO.write(modifiableImage, "bmp", output);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
-//
-//
-//
         nextPreviewTransformation.setText("GrayScale to Dither");
-//        return;
+        globalStepCounter++;
     }
 
 
     public void openFileImage(ActionEvent event) throws IOException {
+        globalStepCounter = 1;
         file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             Image image = new Image(file.toURI().toString());
